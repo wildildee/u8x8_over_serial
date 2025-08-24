@@ -29,4 +29,8 @@ COMMAND$PARAM1$PARAM2$PARAM3$CHECKSUM\n
 ```
 The delimiter '$' can be changed at the top of the main.cpp.
 
-Checksum is calculated using the sum of the characters ascii value modulo 256 (excluding the delimiters, eol, and checksum itself) and sent as one character.
+Checksum is calculated using the following steps
+- Sum the ASCII values of all the characters in the COMMAND and PARAM fields
+- Modulo by 96
+- Add 32
+- Convert this value to it's corresponding ASCII character and send as the CHECKSUM

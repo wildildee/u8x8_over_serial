@@ -3,7 +3,7 @@
 
 // Program Settings
 
-const bool DEBUG = false;
+const bool DEBUG = true;
 
 U8X8_SSD1322_NHD_256X64_4W_SW_SPI u8x8(/* clock=*/ 13, /* data=*/ 11, /* cs=*/ 10, /* dc=*/ 9, /* reset=*/ 8);
 
@@ -11,6 +11,9 @@ const int FLIP = 1;
 
 const int SERIAL_BAUD = 115200;
 const char SERIAL_DELIM = '$';
+
+const int CHECKSUM_MOD = 96;
+const int CHECKSUM_OFF = 32;
 
 // Declarations
 enum State {COMMND, PARAM1, PARAM2, PARAM3, CHKSUM};
@@ -23,6 +26,7 @@ struct Command {
 
 int executeCommand(Command*);
 void debugCommand(Command*);
+int checksumAdd(int, int);
 
 // Variables
 State state = (State)0;
@@ -33,6 +37,7 @@ void setup() {
   u8x8.begin();
   u8x8.setPowerSave(0);
   u8x8.setFlipMode(FLIP);
+  u8x8.setFont(u8x8_font_chroma48medium8_r);
 
   // Startup Serial
   Serial.begin(SERIAL_BAUD);
@@ -71,22 +76,22 @@ void loop() {
       switch(state) {
         case COMMND:
           incomingCommand.command += newChar;
-          incomingCommand.curChecksum = (incomingCommand.curChecksum + newChar) % 256;
+          incomingCommand.curChecksum = checksumAdd(incomingCommand.curChecksum, newChar);
           break;
         case PARAM1:
           incomingCommand.param[0] += newChar;
-          incomingCommand.curChecksum = (incomingCommand.curChecksum + newChar) % 256;
+          incomingCommand.curChecksum = checksumAdd(incomingCommand.curChecksum, newChar);
           break;
         case PARAM2:
           incomingCommand.param[1] += newChar;
-          incomingCommand.curChecksum = (incomingCommand.curChecksum + newChar) % 256;
+          incomingCommand.curChecksum = checksumAdd(incomingCommand.curChecksum, newChar);
           break;
         case PARAM3:
           incomingCommand.param[2] += newChar;
-          incomingCommand.curChecksum = (incomingCommand.curChecksum + newChar) % 256;
+          incomingCommand.curChecksum = checksumAdd(incomingCommand.curChecksum, newChar);
           break;
         case CHKSUM:
-          incomingCommand.tgtChecksum = newChar;
+          incomingCommand.tgtChecksum = newChar - CHECKSUM_OFF;
           break;
       }
     }
@@ -126,6 +131,13 @@ int executeCommand(Command* command) {
 }
 
 /*
+  Checksum Add
+*/
+int checksumAdd(int initial, int addend) {
+  return (initial + addend) % CHECKSUM_MOD;
+}
+
+/*
   Displays the Command command on the display
 */
 void debugCommand(Command* command) {
@@ -134,7 +146,7 @@ void debugCommand(Command* command) {
   u8x8.drawString(0,1,command->param[0].c_str());
   u8x8.drawString(0,2,command->param[1].c_str());
   u8x8.drawString(0,3,command->param[2].c_str());
-  u8x8.drawString(0,4,String(command->tgtChecksum).c_str());
-  u8x8.drawString(0,5,String(command->curChecksum).c_str());
+  u8x8.drawString(0,4,(String(command->tgtChecksum) + " -> " + char(command->tgtChecksum + CHECKSUM_OFF)).c_str());
+  u8x8.drawString(0,5,(String(command->curChecksum) + " -> " + char(command->curChecksum + CHECKSUM_OFF)).c_str());
   u8x8.drawString(0,6,(command->curChecksum == command->tgtChecksum) ? "Good Checksum" : "Bad Checksum");
 }
