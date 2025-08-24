@@ -10,7 +10,7 @@ U8X8_SSD1322_NHD_256X64_4W_SW_SPI u8x8(/* clock=*/ 13, /* data=*/ 11, /* cs=*/ 1
 const int FLIP = 1;
 
 const int SERIAL_BAUD = 115200;
-const char SERIAL_DELIM = '$';
+const char SERIAL_DELIM = '\t';
 
 const int CHECKSUM_MOD = 96;
 const int CHECKSUM_OFF = 32;

@@ -25,12 +25,14 @@ Draws 2x2 string S at pos X,Y
 
 Commands are sent as follows
 ```
-COMMAND$PARAM1$PARAM2$PARAM3$CHECKSUM\n
+COMMAND\tPARAM1\tPARAM2\tPARAM3\tCHECKSUM\n
 ```
-The delimiter '$' can be changed at the top of the main.cpp.
+The delimiter '\t' can be changed at the top of the main.cpp. Make sure you change it to a non-visible ascii character.
 
 Checksum is calculated using the following steps
 - Sum the ASCII values of all the characters in the COMMAND and PARAM fields
 - Modulo by 96
 - Add 32
 - Convert this value to it's corresponding ASCII character and send as the CHECKSUM
+
+The display will respond with ACK or NAK followed by a reason.
