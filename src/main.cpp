@@ -36,10 +36,6 @@ void setup() {
 
   // Startup Serial
   Serial.begin(SERIAL_BAUD);
-
-  // Draw Hello
-  u8x8.setFont(u8x8_font_chroma48medium8_r);
-  u8x8.drawString(0,1,"Hello World!");
 }
 
 void loop() {
