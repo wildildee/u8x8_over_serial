@@ -3,7 +3,7 @@
 
 // Program Settings
 
-const bool DEBUG = true;
+const bool DEBUG = false;
 
 U8X8_SSD1322_NHD_256X64_4W_SW_SPI u8x8(/* clock=*/ 13, /* data=*/ 11, /* cs=*/ 10, /* dc=*/ 9, /* reset=*/ 8);
 
